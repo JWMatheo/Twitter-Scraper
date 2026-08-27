@@ -138,18 +138,13 @@ class ApifyClient:
         if max_total_charge_usd <= 0:
             raise ValueError("max_total_charge_usd must be positive")
 
-        if include_replies:
-            input_payload: dict[str, Any] = {
-                "startUrls": [f"https://x.com/{handle}/with_replies"],
-                "maxItems": max_items,
-                "sort": "Latest",
-            }
-        else:
-            input_payload = {
-                "twitterHandles": [handle],
-                "maxItems": max_items,
-                "sort": "Latest",
-            }
+        input_payload: dict[str, Any] = {
+            "mode": "profileReplies" if include_replies else "profileTweets",
+            "twitterHandles": [handle],
+            "maxItems": max_items,
+            "outputVariant": "rich",
+            "fieldStyle": "snake_case",
+        }
 
         url = APIFY_RUN_SYNC_URL.format(actor_id=self.actor_id)
         headers = {
@@ -209,4 +204,3 @@ class ApifyClient:
             self._sleep((2**attempt) + random.random())
 
         raise ApifyError("Apify request failed")
-

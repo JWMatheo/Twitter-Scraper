@@ -46,17 +46,23 @@ def test_fetch_uses_bearer_header_and_bounded_input():
     args, kwargs = session.calls[0]
     assert "secret-token" not in str(kwargs["params"])
     assert kwargs["headers"]["Authorization"] == "Bearer secret-token"
-    assert kwargs["json"] == {"twitterHandles": ["matheo"], "maxItems": 25, "sort": "Latest"}
+    assert kwargs["json"] == {
+        "mode": "profileTweets",
+        "twitterHandles": ["matheo"],
+        "maxItems": 25,
+        "outputVariant": "rich",
+        "fieldStyle": "snake_case",
+    }
     assert kwargs["params"] == {"maxTotalChargeUsd": "0.020000"}
 
 
-def test_include_replies_uses_replies_profile_url():
+def test_include_replies_uses_replies_profile_mode():
     session = FakeSession(FakeResponse([]))
     client = ApifyClient("token", session=session)
 
     client.fetch_user_tweets("matheo", include_replies=True)
 
-    assert session.calls[0][1]["json"]["startUrls"] == ["https://x.com/matheo/with_replies"]
+    assert session.calls[0][1]["json"]["mode"] == "profileReplies"
 
 
 def test_diagnostic_item_is_an_error():
@@ -65,4 +71,3 @@ def test_diagnostic_item_is_an_error():
 
     with pytest.raises(ApifyError, match="actor failed"):
         client.fetch_user_tweets("matheo")
-
