@@ -8,7 +8,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from .apify_client import ACTOR_ID, ApifyClient, ApifyError
-from .db import connect, upsert_tweets
+from .db import connect, delete_retweets, upsert_tweets
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -47,11 +47,15 @@ def run_fetch(args: argparse.Namespace) -> int:
         )
         with connect(args.db) as connection:
             saved = upsert_tweets(connection, tweets)
+            removed = delete_retweets(connection)
     except (ApifyError, ValueError, OSError) as exc:
         print(f"Erreur: {exc}", file=sys.stderr)
         return 1
 
-    print(f"{saved} tweet(s) enregistré(s) dans {args.db}")
+    message = f"{saved} tweet(s) enregistré(s) dans {args.db}"
+    if removed:
+        message += f" ; {removed} retweet(s) supprimé(s)"
+    print(message)
     return 0
 
 
@@ -64,4 +68,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

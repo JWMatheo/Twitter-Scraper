@@ -98,3 +98,16 @@ def upsert_tweets(connection: sqlite3.Connection, tweets: Iterable[Tweet]) -> in
     connection.commit()
     return len(rows)
 
+
+def delete_retweets(connection: sqlite3.Connection) -> int:
+    """Remove native retweets already stored, including legacy rows without a flag."""
+
+    cursor = connection.execute(
+        """
+        DELETE FROM tweets
+        WHERE is_retweet = 1
+           OR (is_quote_status = 0 AND ltrim(text) LIKE 'RT @%')
+        """
+    )
+    connection.commit()
+    return cursor.rowcount

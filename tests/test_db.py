@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from bird_history.db import connect, upsert_tweets
+from dataclasses import replace
+
+from bird_history.db import connect, delete_retweets, upsert_tweets
 from bird_history.models import Tweet
 
 
@@ -35,3 +37,15 @@ def test_upsert_deduplicates_by_tweet_id(tmp_path):
     assert row["count"] == 1
     assert row["text"] == "updated"
 
+
+def test_delete_retweets_removes_legacy_text_rows(tmp_path):
+    db_path = tmp_path / "tweets.sqlite3"
+    retweet = replace(make_tweet("RT @someone: reposted"), id="2")
+    with connect(db_path) as connection:
+        upsert_tweets(connection, [make_tweet("original"), retweet])
+        connection.execute("UPDATE tweets SET is_retweet = NULL WHERE id = ?", (retweet.id,))
+        connection.commit()
+        assert delete_retweets(connection) == 1
+        row = connection.execute("SELECT text FROM tweets").fetchone()
+
+    assert row["text"] == "original"

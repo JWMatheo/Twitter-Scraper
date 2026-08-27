@@ -37,7 +37,7 @@ bird-history fetch \
   --db data/tweets.sqlite3
 ```
 
-Pour inclure les réponses de l’utilisateur, ajoute `--include-replies`. Les tweets sont dédoublonnés par leur ID et le JSON original est conservé dans `raw_json`.
+Pour inclure les réponses de l’utilisateur, ajoute `--include-replies`. Les tweets sont dédoublonnés par leur ID, les retweets natifs sont exclus à la source puis filtrés une seconde fois localement, et le JSON original est conservé dans `raw_json`.
 
 Pour un premier test prudent, commence avec `--max-items 5 --max-total-charge-usd 0.05` et vérifie d’abord le prix courant affiché par Apify. Le payload utilise `profileTweets` (ou `profileReplies` avec `--include-replies`) et demande une sortie riche adaptée à Python/SQLite.
 

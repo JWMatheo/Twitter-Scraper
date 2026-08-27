@@ -80,15 +80,22 @@ def normalize_tweet(row: dict[str, Any]) -> Tweet:
     elif isinstance(author_object, str):
         author = author or author_object.lstrip("@")
 
+    text = _string(_first(row, "text", "fullText", "full_text")) or ""
+    is_retweet = _boolean(_first(row, "isRetweet", "is_retweet", "retweeted"))
+    if is_retweet is None and _first(row, "retweeted_tweet", "retweetedTweet") is not None:
+        is_retweet = True
+    if is_retweet is None and text.lstrip().startswith("RT @"):
+        is_retweet = True
+
     return Tweet(
         id=tweet_id,
         author=author.lstrip("@") if author else None,
         author_name=author_name,
-        text=_string(_first(row, "text", "fullText", "full_text")) or "",
+        text=text,
         created_at=_string(_first(row, "createdAt", "created_at", "date")),
         url=_string(_first(row, "url", "tweetUrl", "tweetURL", "permalink")),
         is_reply=_boolean(_first(row, "isReply", "is_reply")),
-        is_retweet=_boolean(_first(row, "isRetweet", "is_retweet", "retweeted")),
+        is_retweet=is_retweet,
         is_quote_status=_boolean(_first(row, "isQuoteStatus", "is_quote_status", "isQuote")),
         conversation_id=_string(_first(row, "conversationId", "conversation_id")),
         likes=_integer(_first(row, "likeCount", "likes", "favoriteCount")),
@@ -144,6 +151,7 @@ class ApifyClient:
             "maxItems": max_items,
             "outputVariant": "rich",
             "fieldStyle": "snake_case",
+            "include:nativeretweets": False,
         }
 
         url = APIFY_RUN_SYNC_URL.format(actor_id=self.actor_id)
@@ -170,7 +178,10 @@ class ApifyClient:
             if result_type == "diagnostic":
                 message = _string(_first(item, "message", "error", "errorMessage"))
                 raise ApifyError(message or "The Apify actor returned a diagnostic item")
-            tweets.append(normalize_tweet(item))
+            tweet = normalize_tweet(item)
+            if tweet.is_retweet is True:
+                continue
+            tweets.append(tweet)
         return tweets
 
     def _post_with_retries(

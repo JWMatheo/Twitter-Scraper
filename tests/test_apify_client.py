@@ -33,7 +33,8 @@ def test_fetch_uses_bearer_header_and_bounded_input():
                     "text": "hello",
                     "author": {"username": "matheo", "name": "Matheo"},
                     "likeCount": 4,
-                }
+                },
+                {"id": "456", "text": "RT @someone: reposted", "isRetweet": True},
             ]
         )
     )
@@ -52,6 +53,7 @@ def test_fetch_uses_bearer_header_and_bounded_input():
         "maxItems": 25,
         "outputVariant": "rich",
         "fieldStyle": "snake_case",
+        "include:nativeretweets": False,
     }
     assert kwargs["params"] == {"maxTotalChargeUsd": "0.020000"}
 
@@ -71,3 +73,10 @@ def test_diagnostic_item_is_an_error():
 
     with pytest.raises(ApifyError, match="actor failed"):
         client.fetch_user_tweets("matheo")
+
+
+def test_text_fallback_marks_native_retweet():
+    session = FakeSession(FakeResponse([{"id": "456", "text": "RT @someone: reposted"}]))
+    client = ApifyClient("token", session=session)
+
+    assert client.fetch_user_tweets("matheo") == []
