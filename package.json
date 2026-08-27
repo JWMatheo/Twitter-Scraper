@@ -1,0 +1,12 @@
+{
+  "name": "bird-history-tools",
+  "private": true,
+  "description": "Pinned, audited Bird CLI dependency for read-only X inspection.",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@steipete/bird": "0.8.0"
+  }
+}
+
