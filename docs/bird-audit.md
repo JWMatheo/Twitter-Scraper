@@ -2,6 +2,8 @@
 
 Date de l’audit : 2026-08-27.
 
+Décision : Bird a été retiré du projet. Ce document conserve uniquement la trace de l’audit qui a motivé ce choix ; le code et les dépendances actifs utilisent exclusivement Apify.
+
 ## Provenance
 
 - `bird.fast` référence `github.com/steipete/bird`, mais ce dépôt n’était pas publiquement accessible au moment de l’audit.

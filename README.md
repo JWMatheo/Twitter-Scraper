@@ -39,22 +39,9 @@ bird-history fetch \
 
 Pour inclure les réponses de l’utilisateur, ajoute `--include-replies`. Les tweets sont dédoublonnés par leur ID et le JSON original est conservé dans `raw_json`.
 
-## Bird CLI
-
-Le paquet `@steipete/bird@0.8.0` est installé comme dépendance Node figée. npm le signale toutefois comme `deprecated / no longer supported`. Il a été téléchargé depuis le registry npm avec `--ignore-scripts`, son intégrité SHA-512 a été vérifiée localement, et aucun script d’installation n’est déclaré dans son manifest. Il est donc présent pour inspection et lecture, pas comme dépendance de production du fetcher.
-
-Le repo source actuellement référencé par [bird.fast](https://bird.fast/) n’est pas publiquement accessible. J’ai donc traité le paquet registry comme une dépendance optionnelle auditée, pas comme la source de vérité. Bird lit les cookies X du navigateur et appelle une API X privée non documentée ; il possède aussi des opérations d’écriture. Dans ce projet, il ne faut utiliser que ses commandes de lecture et ne jamais lancer une commande de publication, like, repost, follow ou delete sans revue explicite.
-
-Vérifier l’installation sans lancer de requête X :
-
-```bash
-./node_modules/.bin/bird --help
-```
-
 ## Vérifications
 
 ```bash
 pytest
 python -m compileall src tests
-npm audit --omit=dev
 ```
