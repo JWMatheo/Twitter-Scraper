@@ -1,13 +1,13 @@
 # Twitter Scraper
 
-Twitter Scraper récupère les tweets publics d’un compte X avec l’Actor Apify [xquik/x-tweet-scraper](https://apify.com/xquik/x-tweet-scraper), puis les enregistre dans une base de données SQLite 3 locale.
+Twitter Scraper fetches public posts from an X account through the Apify Actor [xquik/x-tweet-scraper](https://apify.com/xquik/x-tweet-scraper), then stores them in a local SQLite 3 database.
 
-Le fichier SQLite reste sur ton ordinateur. Il peut ensuite alimenter [GBrain](https://github.com/garrytan/gbrain), ton cerveau local connecté à Codex, afin que tes tweets deviennent un corpus de mémoire et de recherche. Les tweets et le token Apify ne sont jamais ajoutés au dépôt Git.
+The SQLite file stays on your computer. It can then feed [GBrain](https://github.com/garrytan/gbrain), your local memory layer connected to Codex, so your tweets become a searchable local corpus. Neither the tweets nor the Apify token are committed to Git.
 
-## Prérequis
+## Requirements
 
-- Python 3.11 ou plus récent ;
-- un [token API Apify](https://console.apify.com/account/integrations).
+- Python 3.11 or later;
+- an [Apify API token](https://console.apify.com/account/integrations).
 
 ## Installation
 
@@ -20,41 +20,41 @@ python -m pip install -e '.[dev]'
 cp .env.example .env
 ```
 
-Ajoute ton token dans le fichier `.env` local :
+Add your token to the local `.env` file:
 
 ```dotenv
 APIFY_TOKEN=...
 ```
 
-Ne committe jamais ce fichier. L’appel à Apify est plafonné par `--max-total-charge-usd` afin de borner le coût de chaque exécution.
+Never commit this file. The `--max-total-charge-usd` option sets a hard spending cap for each Apify run.
 
-## Créer la base SQLite
+## Create the SQLite database
 
 ```bash
 twitter-scraper fetch \
-  --handle @ton_compte \
+  --handle @your_account \
   --max-items 100 \
   --max-total-charge-usd 0.05 \
   --db data/tweets.sqlite3
 ```
 
-La commande crée automatiquement `data/tweets.sqlite3` et la table `tweets`. Les tweets sont dédoublonnés par leur identifiant, les retweets natifs sont écartés et la réponse Apify originale est conservée dans la colonne `raw_json`.
+The command creates `data/tweets.sqlite3` and its `tweets` table automatically. Posts are deduplicated by ID, native retweets are excluded, and the original Apify payload is retained in the `raw_json` column.
 
-Ajoute `--include-replies` pour récupérer également les réponses du compte. Pour un premier essai, utilise `--max-items 5` et vérifie le [tarif actuel de l’Actor](https://apify.com/xquik/x-tweet-scraper/pricing).
+Add `--include-replies` to fetch the account's replies as well. For a first run, use `--max-items 5` and check the Actor's [current pricing](https://apify.com/xquik/x-tweet-scraper/pricing).
 
-## Utiliser la base avec GBrain
+## Use the database with GBrain
 
-La base `data/tweets.sqlite3` est le livrable local du scraper. Elle peut ensuite être donnée à ton workflow d’import GBrain :
+The `data/tweets.sqlite3` database is the scraper's local output. You can then pass it to your GBrain import workflow:
 
-1. Twitter Scraper récupère les tweets via Apify et les structure dans SQLite 3 ;
-2. le workflow d’import lit cette base et envoie les tweets utiles dans GBrain ;
-3. GBrain permet ensuite à Codex de retrouver et d’exploiter ce corpus depuis ton cerveau local.
+1. Twitter Scraper fetches posts through Apify and structures them in SQLite 3.
+2. The import workflow reads the database and sends the relevant posts to GBrain.
+3. GBrain lets Codex retrieve and use that corpus from your local memory.
 
-Le dépôt s’arrête volontairement à la création de la base SQLite. La commande `twitter-scraper` ne lance pas automatiquement l’import dans GBrain.
+This repository intentionally stops at creating the SQLite database. The `twitter-scraper` command does not start the GBrain import automatically.
 
-## Limite importante
+## Important limitation
 
-Le scraper effectue une collecte bornée et ne garantit pas un historique exhaustif. Pour récupérer l’intégralité des tweets d’un compte qui t’appartient, utilise plutôt l’[archive X officielle](https://help.x.com/en/managing-your-account/accessing-your-x-data).
+The scraper performs a bounded collection and cannot guarantee a complete history. To retrieve the full history of an account you own, use the [official X archive](https://help.x.com/en/managing-your-account/accessing-your-x-data) instead.
 
 ## Tests
 
