@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from bird_history.db import connect, delete_retweets, upsert_tweets
-from bird_history.models import Tweet
+from twitter_scraper.db import connect, delete_retweets, upsert_tweets
+from twitter_scraper.models import Tweet
 
 
 def make_tweet(text: str) -> Tweet:

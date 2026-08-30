@@ -6,7 +6,7 @@ from typing import Any
 
 @dataclass(frozen=True, slots=True)
 class Tweet:
-    """Normalized tweet fields retained by the local database."""
+    """Normalized tweet fields retained by the local SQLite database."""
 
     id: str
     author: str | None
@@ -24,4 +24,3 @@ class Tweet:
     quotes: int | None
     views: int | None
     raw: dict[str, Any]
-

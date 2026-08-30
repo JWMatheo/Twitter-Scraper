@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from bird_history.apify_client import ApifyClient, ApifyError
+from twitter_scraper.apify_client import ApifyClient, ApifyError
 
 
 class FakeResponse:

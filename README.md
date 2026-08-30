@@ -1,47 +1,67 @@
-# Bird — X history capture
+# Twitter Scraper
 
-Ce projet récupère, de façon bornée, les tweets publics d’un compte X et les conserve dans une base SQLite locale afin de pouvoir ensuite analyser ton style d’écriture.
+Twitter Scraper récupère les tweets publics d’un compte X avec l’Actor Apify [xquik/x-tweet-scraper](https://apify.com/xquik/x-tweet-scraper), puis les enregistre dans une base de données SQLite 3 locale.
 
-## Choix du fetcher
+Le fichier SQLite reste sur ton ordinateur : tu peux l’ouvrir dans JetBrains, DB Browser for SQLite, la commande `sqlite3`, Python ou tout autre outil compatible SQLite. Les tweets et le token Apify ne sont jamais ajoutés au dépôt Git.
 
-Le repo [sergebulaev/x-skills](https://github.com/sergebulaev/x-skills) ne dépend pas de Bird pour lire X : sa skill `x-audience-insights` appelle l’Actor [xquik/x-tweet-scraper](https://apify.com/xquik/x-tweet-scraper) sur Apify. Cette voie ne demande pas les cookies du navigateur, et l’API Apify permet de fixer `maxTotalChargeUsd` pour plafonner une exécution.
+## Prérequis
 
-Elle ne promet cependant pas de récupérer tout l’historique d’un compte. Pour une archive complète, le point de départ le plus fiable est l’[archive X officielle](https://help.x.com/en/managing-your-account/accessing-your-x-data), qui contient l’historique des posts dans un format machine-readable.
+- Python 3.11 ou plus récent ;
+- un [token API Apify](https://console.apify.com/account/integrations).
 
 ## Installation
 
 ```bash
-cd /Users/matheovallone/dev/perso/Bird
+git clone git@github.com:JWMatheo/Twitter-Scraper.git
+cd Twitter-Scraper
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
 cp .env.example .env
 ```
 
-Ajoute ensuite ton token Apify uniquement dans `.env` :
+Ajoute ton token dans le fichier `.env` local :
 
 ```dotenv
 APIFY_TOKEN=...
 ```
 
-Le token se crée depuis [Apify Integrations](https://console.apify.com/account/integrations). Ne le colle pas dans le chat et ne le committe pas. Le plan gratuit Apify inclut un crédit initial, mais l’Actor reste facturé selon son usage ; le script garde donc un plafond par exécution.
+Ne committe jamais ce fichier. L’appel à Apify est plafonné par `--max-total-charge-usd` afin de borner le coût de chaque exécution.
 
-## Récupération
+## Créer la base SQLite
 
 ```bash
-source .venv/bin/activate
-bird-history fetch \
+twitter-scraper fetch \
   --handle @ton_compte \
   --max-items 100 \
   --max-total-charge-usd 0.05 \
   --db data/tweets.sqlite3
 ```
 
-Pour inclure les réponses de l’utilisateur, ajoute `--include-replies`. Les tweets sont dédoublonnés par leur ID, les retweets natifs sont exclus à la source puis filtrés une seconde fois localement, et le JSON original est conservé dans `raw_json`.
+La commande crée automatiquement `data/tweets.sqlite3` et la table `tweets`. Les tweets sont dédoublonnés par leur identifiant, les retweets natifs sont écartés et la réponse Apify originale est conservée dans la colonne `raw_json`.
 
-Pour un premier test prudent, commence avec `--max-items 5 --max-total-charge-usd 0.05` et vérifie d’abord le prix courant affiché par Apify. Le payload utilise `profileTweets` (ou `profileReplies` avec `--include-replies`) et demande une sortie riche adaptée à Python/SQLite.
+Ajoute `--include-replies` pour récupérer également les réponses du compte. Pour un premier essai, utilise `--max-items 5` et vérifie le [tarif actuel de l’Actor](https://apify.com/xquik/x-tweet-scraper/pricing).
 
-## Vérifications
+## Ouvrir la base dans JetBrains
+
+Dans un IDE JetBrains qui inclut les outils de base de données, par exemple DataGrip ou PyCharm Professional :
+
+1. ouvre la fenêtre **Database** ;
+2. choisis **New** → **Data Source** → **SQLite** ;
+3. sélectionne le fichier `data/tweets.sqlite3` ;
+4. télécharge le pilote SQLite si JetBrains le propose, puis teste la connexion.
+
+La procédure complète est décrite dans la [documentation SQLite de JetBrains](https://www.jetbrains.com/help/datagrip/sqlite.html). En ligne de commande, tu peux aussi lancer :
+
+```bash
+sqlite3 data/tweets.sqlite3
+```
+
+## Limite importante
+
+Le scraper effectue une collecte bornée et ne garantit pas un historique exhaustif. Pour récupérer l’intégralité des tweets d’un compte qui t’appartient, utilise plutôt l’[archive X officielle](https://help.x.com/en/managing-your-account/accessing-your-x-data).
+
+## Tests
 
 ```bash
 pytest

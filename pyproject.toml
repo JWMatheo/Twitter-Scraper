@@ -3,9 +3,9 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bird-history"
+name = "twitter-scraper"
 version = "0.1.0"
-description = "Bounded, deduplicated X timeline capture using the Apify actor referenced by x-skills."
+description = "Fetch public X posts with Apify and store them in a local SQLite 3 database."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -19,7 +19,7 @@ dev = [
 ]
 
 [project.scripts]
-bird-history = "bird_history.cli:main"
+twitter-scraper = "twitter_scraper.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -27,4 +27,3 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-

@@ -13,7 +13,7 @@ from .db import connect, delete_retweets, upsert_tweets
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="bird-history",
+        prog="twitter-scraper",
         description="Capture a bounded X timeline into a local SQLite database.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)

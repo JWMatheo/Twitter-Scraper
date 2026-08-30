@@ -108,7 +108,7 @@ def normalize_tweet(row: dict[str, Any]) -> Tweet:
 
 
 class ApifyClient:
-    """Small client for one bounded, synchronous Apify actor run."""
+    """Small client for one bounded, synchronous Apify Actor run."""
 
     def __init__(
         self,
