@@ -2,7 +2,7 @@
 
 Twitter Scraper récupère les tweets publics d’un compte X avec l’Actor Apify [xquik/x-tweet-scraper](https://apify.com/xquik/x-tweet-scraper), puis les enregistre dans une base de données SQLite 3 locale.
 
-Le fichier SQLite reste sur ton ordinateur : tu peux l’ouvrir dans JetBrains, DB Browser for SQLite, la commande `sqlite3`, Python ou tout autre outil compatible SQLite. Les tweets et le token Apify ne sont jamais ajoutés au dépôt Git.
+Le fichier SQLite reste sur ton ordinateur. Il peut ensuite alimenter [GBrain](https://github.com/garrytan/gbrain), ton cerveau local connecté à Codex, afin que tes tweets deviennent un corpus de mémoire et de recherche. Les tweets et le token Apify ne sont jamais ajoutés au dépôt Git.
 
 ## Prérequis
 
@@ -42,20 +42,15 @@ La commande crée automatiquement `data/tweets.sqlite3` et la table `tweets`. Le
 
 Ajoute `--include-replies` pour récupérer également les réponses du compte. Pour un premier essai, utilise `--max-items 5` et vérifie le [tarif actuel de l’Actor](https://apify.com/xquik/x-tweet-scraper/pricing).
 
-## Ouvrir la base dans JetBrains
+## Utiliser la base avec GBrain
 
-Dans un IDE JetBrains qui inclut les outils de base de données, par exemple DataGrip ou PyCharm Professional :
+La base `data/tweets.sqlite3` est le livrable local du scraper. Elle peut ensuite être donnée à ton workflow d’import GBrain :
 
-1. ouvre la fenêtre **Database** ;
-2. choisis **New** → **Data Source** → **SQLite** ;
-3. sélectionne le fichier `data/tweets.sqlite3` ;
-4. télécharge le pilote SQLite si JetBrains le propose, puis teste la connexion.
+1. Twitter Scraper récupère les tweets via Apify et les structure dans SQLite 3 ;
+2. le workflow d’import lit cette base et envoie les tweets utiles dans GBrain ;
+3. GBrain permet ensuite à Codex de retrouver et d’exploiter ce corpus depuis ton cerveau local.
 
-La procédure complète est décrite dans la [documentation SQLite de JetBrains](https://www.jetbrains.com/help/datagrip/sqlite.html). En ligne de commande, tu peux aussi lancer :
-
-```bash
-sqlite3 data/tweets.sqlite3
-```
+Le dépôt s’arrête volontairement à la création de la base SQLite. La commande `twitter-scraper` ne lance pas automatiquement l’import dans GBrain.
 
 ## Limite importante
 
